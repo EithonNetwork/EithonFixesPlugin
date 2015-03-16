@@ -1,4 +1,4 @@
-package se.fredsfursten.telepadplugin;
+package se.fredsfursten.eithonfixesplugin;
 
 import java.io.File;
 
@@ -19,10 +19,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import se.fredsfursten.plugintools.PluginConfig;
-import se.fredsfursten.telepadplugin.Teleer;
+import se.fredsfursten.eithonfixesplugin.Fixes;
 
-public final class TelePadPlugin extends JavaPlugin implements Listener {
-	private static File telePadStorageFile;
+public final class EithonFixesPlugin extends JavaPlugin implements Listener {
+	private static File EithonFixestorageFile;
 	private static PluginConfig configuration;
 
 	@Override
@@ -33,60 +33,28 @@ public final class TelePadPlugin extends JavaPlugin implements Listener {
 			configuration.load();
 		}
 
-		telePadStorageFile = new File(getDataFolder(), "telepads.bin");
+		EithonFixestorageFile = new File(getDataFolder(), "EithonFixes.bin");
 		getServer().getPluginManager().registerEvents(this, this);		
-		Teleer.get().enable(this);
+		Fixes.get().enable(this);
 		Commands.get().enable(this);
 	}
 
 	@Override
 	public void onDisable() {
-		Teleer.get().disable();
+		Fixes.get().disable();
 		Commands.get().disable();
-	}
-
-	@EventHandler
-	public void onPlayerInteractEvent(PlayerInteractEvent event) {
-		if (event.isCancelled()) return;
-		if (event.getAction() != Action.PHYSICAL) return;
-		Player player = event.getPlayer();
-		Block pressurePlate = event.getClickedBlock();
-		if (pressurePlate == null) return;
-		if (pressurePlate.getType() != Material.STONE_PLATE) return;
-		Teleer.get().maybeTele(player, pressurePlate);
-	}
-
-	@EventHandler
-	public void listenToCommands(PlayerCommandPreprocessEvent event) {
-		Commands.get().listenToCommands(event.getPlayer(), event.getMessage());
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage("You must be a player!");
-			return false;
-		}
 		if (args.length < 1) {
 			sender.sendMessage("Incomplete command...");
 			return false;
 		}
 
-		Player player = (Player) sender;
-
 		String command = args[0].toLowerCase();
-		if (command.equals("add")) {
-			Commands.get().addCommand(player, args);
-		} else if (command.equals("link")) {
-			Commands.get().linkCommand(player, args);
-		} else if (command.equals("remove")) {
-			Commands.get().removeCommand(player, args);
-		} else if (command.equals("list")) {
-			Commands.get().listCommand(player);
-		} else if (command.equals("goto")) {
-			Commands.get().gotoCommand(player, args);
-		} else if (command.equals("reload")) {
-			Commands.get().reloadCommand(player, args);
+		if (command.equals("buy")) {
+			Commands.get().buyCommand(sender, args);
 		} else {
 			sender.sendMessage("Could not understand command.");
 			return false;
@@ -98,7 +66,7 @@ public final class TelePadPlugin extends JavaPlugin implements Listener {
 
 	public static File getStorageFile()
 	{
-		return telePadStorageFile;
+		return EithonFixestorageFile;
 	}
 
 	public static FileConfiguration getPluginConfig()

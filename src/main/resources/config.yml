@@ -1,10 +1,2 @@
-TeleportAfterTicks: 100
-BlindnessTicks: 0
-NauseaTicks: 200
-SlownessTicks: 0
-DisableEffectsAfterTicks: 120
-
-
-
-
-
+GiveCommand: give %s %s %d
+TakeCommand: eco take %s %f
