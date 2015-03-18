@@ -64,7 +64,7 @@ public class Commands {
 		}
 		int amount;
 		try {
-			amount = Integer.parseInt(args[3]);
+			amount = Integer.parseInt(args[4]);
 		} catch (Exception e) {
 			sender.sendMessage(BUY_COMMAND);
 			return;			
