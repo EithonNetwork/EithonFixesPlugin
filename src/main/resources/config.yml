@@ -1,2 +1,4 @@
+# GiveCommand will be fed with three parameters: <player> (%s) <item> (%s) and <amount> (%d)
 GiveCommand: give %s %s %d
+# TakeCommand will be fed with two parameters: <player> (%s) <totalprice> (%f)
 TakeCommand: eco take %s %f
