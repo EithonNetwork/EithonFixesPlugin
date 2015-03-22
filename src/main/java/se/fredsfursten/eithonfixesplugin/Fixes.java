@@ -1,22 +1,19 @@
 package se.fredsfursten.eithonfixesplugin;
 
-import java.math.BigDecimal;
-
-import com.earth2me.essentials.api.Economy;
-
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.earth2me.essentials.api.UserDoesNotExistException;
-
 import se.fredsfursten.plugintools.Misc;
+
+import com.earth2me.essentials.api.Economy;
+import com.earth2me.essentials.api.UserDoesNotExistException;
 
 public class Fixes {
 	private static Fixes singleton = null;
 	private static String giveCommandFormat;
 	private static String takeCommandFormat;
-	private static Economy essentialsApi;
 
 	private JavaPlugin plugin = null;
 
@@ -37,7 +34,6 @@ public class Fixes {
 		this.plugin = plugin;
 		Plugin ess = plugin.getServer().getPluginManager().getPlugin("Economy");
 		if (ess != null && ess.isEnabled()) {
-			essentialsApi = (Economy) ess;
 			plugin.getLogger().info("Succesfully hooked into Essentials economy!");
 		}	
 	}
@@ -74,6 +70,9 @@ public class Fixes {
 
 		Misc.executeCommand(takeCommand);
 		Misc.executeCommand(giveCommand);
+		
+		buyingPlayer.sendMessage(String.format(
+				"You successfully purchased %d item(s) of %s.", amount, item));
 	}
 
 	private String getGiveCommand(Player buyingPlayer, String item, int amount) {
@@ -100,5 +99,19 @@ public class Fixes {
 			return null;			
 		}
 		return takeCommand;
+	}
+
+	@SuppressWarnings("deprecation")
+	public void balance(CommandSender sender) {
+		Player player = (Player)sender;
+		String playerName = player.getName();
+		double balance;
+		try {
+			balance = Economy.getMoney(playerName);
+		} catch (UserDoesNotExistException e) {
+			sender.sendMessage(String.format("Could not find a user named \"%s\".", playerName));
+			return;
+		}
+		sender.sendMessage(String.format("Your balance is %.2f E-Coins.", balance));
 	}
 }

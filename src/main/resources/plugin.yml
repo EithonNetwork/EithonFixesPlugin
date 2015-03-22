@@ -1,19 +1,23 @@
 name: EithonFixesPlugin
 main: se.fredsfursten.eithonfixesplugin.EithonFixesPlugin
-version: 1.0
+version: 1.1
 author: vanbrayne
 depend: [Essentials]
 description: A Minecraft plugin for Eithon fixes
 commands:
   eithonfixes:
     description: Fix things other plugins fail to do
-    usage: /eithonfixes buy
+    usage: /eithonfixes buy | balance
     permission-message: You don't have <permission>
 permissions:
   eithonfixes.*:
     description: Gives access to all eithonfixes commands
     default: op
     eithonfixes.buy: true
+    eithonfixes.balance: true
   eithonfixes.buy:
     description: Access to /eithonfixes buy command
+    default: op
+  eithonfixes.balance:
+    description: Access to /eithonfixes balance command
     default: op

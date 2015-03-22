@@ -55,6 +55,8 @@ public final class EithonFixesPlugin extends JavaPlugin implements Listener {
 		String command = args[0].toLowerCase();
 		if (command.equals("buy")) {
 			Commands.get().buyCommand(sender, args);
+		} else if (command.equals("balance")) {
+				Commands.get().balanceCommand(sender, args);
 		} else {
 			sender.sendMessage("Could not understand command.");
 			return false;

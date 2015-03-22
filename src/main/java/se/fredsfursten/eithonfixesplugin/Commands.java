@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Commands {
 	private static Commands singleton = null;
 	private static final String BUY_COMMAND = "/eithonfixes buy <player> <item> <price> <amount>";
+	private static final String BALANCE_COMMAND = "/eithonfixes balance";
 
 	private JavaPlugin plugin = null;
 
@@ -73,6 +74,20 @@ public class Commands {
 		Fixes.get().buy(buyingPlayer, item, pricePerItem, amount);
 	}
 
+	void balanceCommand(CommandSender sender, String[] args)
+	{
+		if (sender instanceof Player) {
+			if (!verifyPermission((Player) sender, "eithonfixes.balance")) return;
+		}
+		if (!arrayLengthIsWithinInterval(args, 1, 1)) {
+			sender.sendMessage(BALANCE_COMMAND);
+			return;
+		}		
+
+		Fixes.get().balance(sender);
+	}
+
+	
 	private boolean verifyPermission(Player player, String permission)
 	{
 		if (player.hasPermission(permission)) return true;
