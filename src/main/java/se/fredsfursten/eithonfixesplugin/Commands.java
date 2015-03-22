@@ -38,7 +38,7 @@ public class Commands {
 		if (sender instanceof Player) {
 			if (!verifyPermission((Player) sender, "eithonfixes.buy")) return;
 		}
-		if (!arrayLengthIsWithinInterval(args, 5, 5)) {
+		if (!arrayLengthIsWithinInterval(args, 4, 5)) {
 			sender.sendMessage(BUY_COMMAND);
 			return;
 		}
@@ -63,12 +63,14 @@ public class Commands {
 			sender.sendMessage(BUY_COMMAND);
 			return;			
 		}
-		int amount;
-		try {
-			amount = Integer.parseInt(args[4]);
-		} catch (Exception e) {
-			sender.sendMessage(BUY_COMMAND);
-			return;			
+		int amount = 1;
+		if (args.length > 4) {
+			try {
+				amount = Integer.parseInt(args[4]);
+			} catch (Exception e) {
+				sender.sendMessage(BUY_COMMAND);
+				return;			
+			}
 		}
 
 		Fixes.get().buy(buyingPlayer, item, pricePerItem, amount);
@@ -87,7 +89,7 @@ public class Commands {
 		Fixes.get().balance(sender);
 	}
 
-	
+
 	private boolean verifyPermission(Player player, String permission)
 	{
 		if (player.hasPermission(permission)) return true;
