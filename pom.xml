@@ -2,6 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>se.fredsfursten</groupId>
   <artifactId>EithonFixesPlugin</artifactId>
+   <version>1.0</version>
   <name>EithonFixesPlugin</name>
   <build>
       <plugins>
@@ -40,5 +41,4 @@
            <version>2.13.1</version>
        </dependency>
    </dependencies>
-   <version>0.3</version>
 </project>
