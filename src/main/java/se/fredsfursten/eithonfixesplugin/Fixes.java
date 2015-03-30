@@ -14,12 +14,33 @@ public class Fixes {
 	private static Fixes singleton = null;
 	private static String giveCommandFormat;
 	private static String takeCommandFormat;
+	private static String youNeedMoreMoneyFormat;
+	private static String successfulPurchaseFormat;
+	private static String currentBalanceFormat;
 
 	private JavaPlugin plugin = null;
 
 	private Fixes() {
 		giveCommandFormat = EithonFixesPlugin.getPluginConfig().getString("GiveCommand");
+		if (giveCommandFormat == null) {
+			giveCommandFormat = "give %s %s %d";
+		}
 		takeCommandFormat = EithonFixesPlugin.getPluginConfig().getString("TakeCommand");
+		if (takeCommandFormat == null) {
+			takeCommandFormat = "eco take %s %f";
+		}
+		youNeedMoreMoneyFormat = EithonFixesPlugin.getPluginConfig().getString("YouNeedMoreMoneyMessage");
+		if (youNeedMoreMoneyFormat == null) {
+			youNeedMoreMoneyFormat = "You need %.2f to buy %d %s. You have %.2f.";
+		}
+		successfulPurchaseFormat = EithonFixesPlugin.getPluginConfig().getString("SuccessfulPurchaseMessage");
+		if (successfulPurchaseFormat == null) {
+			successfulPurchaseFormat = "You successfully purchased %d item(s) of %s.";
+		}
+		currentBalanceFormat = EithonFixesPlugin.getPluginConfig().getString("CurrentBalanceMessage");
+		if (currentBalanceFormat == null) {
+			currentBalanceFormat = "Your balance is %.2f E-Coins.";
+		}
 	}
 
 	static Fixes get()
@@ -56,9 +77,12 @@ public class Fixes {
 			return;
 		}
 		if (!hasEnough) {
-			buyingPlayer.sendMessage(String.format(
-					"You need %.2f to buy %d %s. You have %.2f.",
-					totalPrice, amount, item, balance));
+			try {
+				buyingPlayer.sendMessage(String.format(
+						youNeedMoreMoneyFormat, totalPrice, amount, item, balance));
+			} catch (Exception e) {
+				Misc.configurableFormatFailed(buyingPlayer, "YouNeedMoreMoneyMessage", youNeedMoreMoneyFormat, 4, e);			
+			}
 			return;
 		}
 
@@ -70,9 +94,12 @@ public class Fixes {
 
 		Misc.executeCommand(takeCommand);
 		Misc.executeCommand(giveCommand);
-		
-		buyingPlayer.sendMessage(String.format(
-				"You successfully purchased %d item(s) of %s.", amount, item));
+
+		try {
+			buyingPlayer.sendMessage(String.format(successfulPurchaseFormat, amount, item));
+		} catch (Exception e) {
+			Misc.configurableFormatFailed(buyingPlayer, "SuccessfulPurchaseMessage", successfulPurchaseFormat, 2, e);
+		}
 	}
 
 	private String getGiveCommand(Player buyingPlayer, String item, int amount) {
@@ -80,9 +107,7 @@ public class Fixes {
 		try {
 			giveCommand = String.format(giveCommandFormat, buyingPlayer.getName(), item, amount);
 		} catch (Exception e) {
-			buyingPlayer.sendMessage(String.format(
-					"The GiveCommand (%s) from config.yml is not correctly formatted.",
-					giveCommandFormat));
+			Misc.configurableFormatFailed(buyingPlayer, "GiveCommand", giveCommandFormat, 3, e);
 			return null;
 		}
 		return giveCommand;
@@ -93,9 +118,7 @@ public class Fixes {
 		try {
 			takeCommand = String.format(takeCommandFormat, buyingPlayer.getName(), price);
 		} catch (Exception e) {
-			buyingPlayer.sendMessage(String.format(
-					"The TakeCommand (%s) from config.yml is not correctly formatted.",
-					takeCommandFormat));
+			Misc.configurableFormatFailed(buyingPlayer, "TakeCommand", takeCommandFormat, 2, e);
 			return null;			
 		}
 		return takeCommand;
@@ -112,6 +135,10 @@ public class Fixes {
 			sender.sendMessage(String.format("Could not find a user named \"%s\".", playerName));
 			return;
 		}
-		sender.sendMessage(String.format("Your balance is %.2f E-Coins.", balance));
+		try {
+			sender.sendMessage(String.format(currentBalanceFormat, balance));
+		} catch (Exception e) {
+			Misc.configurableFormatFailed(sender, "CurrentBalanceMessage", currentBalanceFormat, 1, e);
+		}
 	}
 }
