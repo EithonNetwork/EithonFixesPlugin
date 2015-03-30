@@ -4,6 +4,10 @@ A EithonFixes plugin for Minecraft.
 
 ## Release history
 
+### 1.4 (2015-03-30)
+
+* CHANGE: Refactored configurable messages.
+
 ### 1.3 (2015-03-30)
 
 * CHANGE: User messages can now be configured

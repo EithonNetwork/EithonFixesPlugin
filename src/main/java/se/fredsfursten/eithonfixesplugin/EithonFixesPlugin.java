@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
+import se.fredsfursten.plugintools.ConfigurableFormat;
 import se.fredsfursten.plugintools.PluginConfig;
 import se.fredsfursten.eithonfixesplugin.Fixes;
 
@@ -37,6 +38,7 @@ public final class EithonFixesPlugin extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(this, this);		
 		Fixes.get().enable(this);
 		Commands.get().enable(this);
+		ConfigurableFormat.enable(getPluginConfig());
 	}
 
 	@Override
