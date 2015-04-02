@@ -33,12 +33,12 @@ public final class EithonFixesPlugin extends JavaPlugin implements Listener {
 		} else {
 			configuration.load();
 		}
+		ConfigurableFormat.enable(getPluginConfig());
 
 		EithonFixestorageFile = new File(getDataFolder(), "EithonFixes.bin");
 		getServer().getPluginManager().registerEvents(this, this);		
 		Fixes.get().enable(this);
 		Commands.get().enable(this);
-		ConfigurableFormat.enable(getPluginConfig());
 	}
 
 	@Override
