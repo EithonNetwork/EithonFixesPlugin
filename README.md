@@ -4,6 +4,10 @@ A EithonFixes plugin for Minecraft.
 
 ## Release history
 
+### 1.5 (2015-04-04)
+
+* NEW: Now uses EithonLibraryPlugin.
+
 ### 1.4 (2015-03-30)
 
 * CHANGE: Refactored configurable messages.
