@@ -1,15 +1,36 @@
 #
+# Worlds where there is a penalty for dying
+#
+PenaltyOnDeathWorlds: [W_Hardcore, W_SurvivalFreebuild]
+
+#
+# The cost of dying in one of the worlds in PenaltyOnDeathWorlds
+#
+CostOfDeath: 30.0
+
+#
+# Message after death cost
+#
+# 1 parameter: <cost> (%f)
+#
+PenaltyOnDeathMessage: You death has resulted in a penalty of %.2f.
+
+#
 # GiveCommand has 3 parameters: <player> (%s), <item> (%s), <amount> (%d)
 GiveCommand: give %s %s %d
+
 #
 # TakeCommand has 2 parameters: <player> (%s), <totalprice> (%f)
 TakeCommand: eco take %s %f
+
 #
 # YouNeedMoreMoneyMessage has 4 parameters: <money needed> (%f), <amount> (%d), <item> (%s), <current balance> (%f)
 YouNeedMoreMoneyMessage: You need %.2f to buy %d %s. You have %.2f.
+
 #
 # SuccessfulPurchaseMessage has 2 parameters: <amount> (%d), <item> (%s)
 SuccessfulPurchaseMessage: You successfully purchased %d item(s) of %s.¨
+
 #
 # CurrentBalanceMessage has 1 parameter: <balance> (%f)
 CurrentBalanceMessage: Your balance is %.2f E-Coins.

@@ -14,9 +14,10 @@ public final class EithonFixesPlugin extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		Misc.enable(this);
-		getServer().getPluginManager().registerEvents(this, this);		
+		Events.get().enable(this);
 		Fixes.get().enable(this);
 		Commands.get().enable(this);
+		getServer().getPluginManager().registerEvents(Events.get(), this);		
 	}
 
 	@Override

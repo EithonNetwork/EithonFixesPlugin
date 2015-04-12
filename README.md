@@ -4,6 +4,10 @@ A EithonFixes plugin for Minecraft.
 
 ## Release history
 
+### 2.1 (2015-04-12)
+
+* NEW: Now handles a cost for dying in some worlds
+
 ### 2.0 (2015-04-12)
 
 * NEW: Release.

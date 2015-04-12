@@ -1,12 +1,13 @@
 package se.fredsfursten.eithonfixesplugin;
 
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import se.fredsfursten.plugintools.ConfigurableFormat;
-import se.fredsfursten.plugintools.Misc;
 import se.fredsfursten.plugintools.PluginConfig;
 
 import com.earth2me.essentials.api.Economy;
@@ -14,11 +15,14 @@ import com.earth2me.essentials.api.UserDoesNotExistException;
 
 public class Fixes {
 	private static Fixes singleton = null;
-	private static ConfigurableFormat giveCommandFormat;
-	private static ConfigurableFormat takeCommandFormat;
-	private static ConfigurableFormat youNeedMoreMoneyFormat;
-	private static ConfigurableFormat successfulPurchaseFormat;
-	private static ConfigurableFormat currentBalanceFormat;
+	private ConfigurableFormat giveCommandFormat;
+	private ConfigurableFormat takeCommandFormat;
+	private ConfigurableFormat youNeedMoreMoneyFormat;
+	private ConfigurableFormat successfulPurchaseFormat;
+	private ConfigurableFormat currentBalanceFormat;
+	private List<String> penaltyOnDeathWorlds;
+	private double costOfDeath;
+	private ConfigurableFormat penaltyOnDeathMessage;
 
 	private Fixes() {
 	}
@@ -33,15 +37,19 @@ public class Fixes {
 
 	void enable(JavaPlugin plugin){
 		PluginConfig config = PluginConfig.get(plugin);
-		giveCommandFormat = new ConfigurableFormat(config, "GiveCommand", 3,
+		this.penaltyOnDeathWorlds = config.getStringList("PenaltyOnDeathWorlds");
+		this.costOfDeath = config.getDouble("CostOfDeath", 30.0);
+		this.penaltyOnDeathMessage = new ConfigurableFormat(config, "PenaltyOnDeathMessage", 1,
+				"You death has resulted in a penalty of %.2f.");
+		this.giveCommandFormat = new ConfigurableFormat(config, "GiveCommand", 3,
 				"give %s %s %d");
-		takeCommandFormat = new ConfigurableFormat(config, "TakeCommand", 2,
+		this.takeCommandFormat = new ConfigurableFormat(config, "TakeCommand", 2,
 				"eco take %s %f");
-		youNeedMoreMoneyFormat = new ConfigurableFormat(config, "YouNeedMoreMoneyMessage", 4,
+		this.youNeedMoreMoneyFormat = new ConfigurableFormat(config, "YouNeedMoreMoneyMessage", 4,
 				"You need %.2f to buy %d %s. You have %.2f.");
-		successfulPurchaseFormat = new ConfigurableFormat(config, "SuccessfulPurchaseMessage", 2,
+		this.successfulPurchaseFormat = new ConfigurableFormat(config, "SuccessfulPurchaseMessage", 2,
 				"You successfully purchased %d item(s) of %s.");
-		currentBalanceFormat = new ConfigurableFormat(config, "CurrentBalanceMessage", 1,
+		this.currentBalanceFormat = new ConfigurableFormat(config, "CurrentBalanceMessage", 1,
 				"Your balance is %.2f E-Coins.");
 		Plugin ess = plugin.getServer().getPluginManager().getPlugin("Economy");
 		if (ess != null && ess.isEnabled()) {
@@ -69,51 +77,23 @@ public class Fixes {
 		if (!hasEnough) {
 			try {
 				buyingPlayer.sendMessage(String.format(
-						youNeedMoreMoneyFormat.getFormat(), totalPrice, amount, item, balance));
+						this.youNeedMoreMoneyFormat.getFormat(), totalPrice, amount, item, balance));
 			} catch (Exception e) {
-				youNeedMoreMoneyFormat.reportFailure(buyingPlayer, e);
+				this.youNeedMoreMoneyFormat.reportFailure(buyingPlayer, e);
 			}
 			return;
 		}
 
-		String takeCommand = getTakeCommand(buyingPlayer, totalPrice);
-		if (takeCommand == null) return;
-
-		String giveCommand = getGiveCommand(buyingPlayer, item, amount);
-		if (giveCommand == null) return;
-
-		Misc.executeCommand(takeCommand);
-		Misc.executeCommand(giveCommand);
+		this.takeCommandFormat.execute(buyingPlayer.getName(), totalPrice);
+		this.giveCommandFormat.execute(buyingPlayer.getName(), item, amount);
 
 		try {
-			buyingPlayer.sendMessage(String.format(successfulPurchaseFormat.getFormat(), amount, item));
+			buyingPlayer.sendMessage(String.format(this.successfulPurchaseFormat.getFormat(), amount, item));
 		} catch (Exception e) {
-			successfulPurchaseFormat.reportFailure(buyingPlayer, e);
+			this.successfulPurchaseFormat.reportFailure(buyingPlayer, e);
 		}
 	}
-
-	private String getGiveCommand(Player buyingPlayer, String item, int amount) {
-		String giveCommand;
-		try {
-			giveCommand = String.format(giveCommandFormat.getFormat(), buyingPlayer.getName(), item, amount);
-		} catch (Exception e) {
-			giveCommandFormat.reportFailure(buyingPlayer, e);
-			return null;
-		}
-		return giveCommand;
-	}
-
-	private String getTakeCommand(Player buyingPlayer, double price) {
-		String takeCommand;
-		try {
-			takeCommand = String.format(takeCommandFormat.getFormat(), buyingPlayer.getName(), price);
-		} catch (Exception e) {
-			takeCommandFormat.reportFailure(buyingPlayer, e);
-			return null;			
-		}
-		return takeCommand;
-	}
-
+	
 	@SuppressWarnings("deprecation")
 	public void balance(CommandSender sender) {
 		Player player = (Player)sender;
@@ -126,9 +106,19 @@ public class Fixes {
 			return;
 		}
 		try {
-			sender.sendMessage(String.format(currentBalanceFormat.getFormat(), balance));
+			sender.sendMessage(String.format(this.currentBalanceFormat.getFormat(), balance));
 		} catch (Exception e) {
-			currentBalanceFormat.reportFailure(sender, e);
+			this.currentBalanceFormat.reportFailure(sender, e);
+		}
+	}
+
+	public void playerDied(Player player) {
+		for (String penaltyWorld : this.penaltyOnDeathWorlds) {
+			if (penaltyWorld.equalsIgnoreCase(player.getWorld().getName())) {
+				this.takeCommandFormat.execute(player.getName(), this.costOfDeath);
+				this.penaltyOnDeathMessage.sendMessage(player, this.costOfDeath);
+				break;
+			}
 		}
 	}
 }
