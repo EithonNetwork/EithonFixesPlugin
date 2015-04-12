@@ -12,8 +12,6 @@ public class Commands {
 	private static final String BUY_COMMAND = "/eithonfixes buy <player> <item> <price> <amount>";
 	private static final String BALANCE_COMMAND = "/eithonfixes balance";
 
-	private JavaPlugin plugin = null;
-
 	private Commands() {
 	}
 
@@ -26,7 +24,6 @@ public class Commands {
 	}
 
 	void enable(JavaPlugin plugin){
-		this.plugin = plugin;
 	}
 
 	void disable() {

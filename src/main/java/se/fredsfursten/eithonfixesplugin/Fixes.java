@@ -5,21 +5,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import se.fredsfursten.plugintools.ConfigurableFormat;
 import se.fredsfursten.plugintools.Misc;
+import se.fredsfursten.plugintools.PluginConfig;
 
 import com.earth2me.essentials.api.Economy;
 import com.earth2me.essentials.api.UserDoesNotExistException;
 
 public class Fixes {
 	private static Fixes singleton = null;
-	private static String giveCommandFormat;
-	private static String takeCommandFormat;
-
-	private JavaPlugin plugin = null;
+	private static ConfigurableFormat giveCommandFormat;
+	private static ConfigurableFormat takeCommandFormat;
+	private static ConfigurableFormat youNeedMoreMoneyFormat;
+	private static ConfigurableFormat successfulPurchaseFormat;
+	private static ConfigurableFormat currentBalanceFormat;
 
 	private Fixes() {
-		giveCommandFormat = EithonFixesPlugin.getPluginConfig().getString("GiveCommand");
-		takeCommandFormat = EithonFixesPlugin.getPluginConfig().getString("TakeCommand");
 	}
 
 	static Fixes get()
@@ -31,7 +32,17 @@ public class Fixes {
 	}
 
 	void enable(JavaPlugin plugin){
-		this.plugin = plugin;
+		PluginConfig config = PluginConfig.get(plugin);
+		giveCommandFormat = new ConfigurableFormat(config, "GiveCommand", 3,
+				"give %s %s %d");
+		takeCommandFormat = new ConfigurableFormat(config, "TakeCommand", 2,
+				"eco take %s %f");
+		youNeedMoreMoneyFormat = new ConfigurableFormat(config, "YouNeedMoreMoneyMessage", 4,
+				"You need %.2f to buy %d %s. You have %.2f.");
+		successfulPurchaseFormat = new ConfigurableFormat(config, "SuccessfulPurchaseMessage", 2,
+				"You successfully purchased %d item(s) of %s.");
+		currentBalanceFormat = new ConfigurableFormat(config, "CurrentBalanceMessage", 1,
+				"Your balance is %.2f E-Coins.");
 		Plugin ess = plugin.getServer().getPluginManager().getPlugin("Economy");
 		if (ess != null && ess.isEnabled()) {
 			plugin.getLogger().info("Succesfully hooked into Essentials economy!");
@@ -56,9 +67,12 @@ public class Fixes {
 			return;
 		}
 		if (!hasEnough) {
-			buyingPlayer.sendMessage(String.format(
-					"You need %.2f to buy %d %s. You have %.2f.",
-					totalPrice, amount, item, balance));
+			try {
+				buyingPlayer.sendMessage(String.format(
+						youNeedMoreMoneyFormat.getFormat(), totalPrice, amount, item, balance));
+			} catch (Exception e) {
+				youNeedMoreMoneyFormat.reportFailure(buyingPlayer, e);
+			}
 			return;
 		}
 
@@ -70,19 +84,20 @@ public class Fixes {
 
 		Misc.executeCommand(takeCommand);
 		Misc.executeCommand(giveCommand);
-		
-		buyingPlayer.sendMessage(String.format(
-				"You successfully purchased %d item(s) of %s.", amount, item));
+
+		try {
+			buyingPlayer.sendMessage(String.format(successfulPurchaseFormat.getFormat(), amount, item));
+		} catch (Exception e) {
+			successfulPurchaseFormat.reportFailure(buyingPlayer, e);
+		}
 	}
 
 	private String getGiveCommand(Player buyingPlayer, String item, int amount) {
 		String giveCommand;
 		try {
-			giveCommand = String.format(giveCommandFormat, buyingPlayer.getName(), item, amount);
+			giveCommand = String.format(giveCommandFormat.getFormat(), buyingPlayer.getName(), item, amount);
 		} catch (Exception e) {
-			buyingPlayer.sendMessage(String.format(
-					"The GiveCommand (%s) from config.yml is not correctly formatted.",
-					giveCommandFormat));
+			giveCommandFormat.reportFailure(buyingPlayer, e);
 			return null;
 		}
 		return giveCommand;
@@ -91,11 +106,9 @@ public class Fixes {
 	private String getTakeCommand(Player buyingPlayer, double price) {
 		String takeCommand;
 		try {
-			takeCommand = String.format(takeCommandFormat, buyingPlayer.getName(), price);
+			takeCommand = String.format(takeCommandFormat.getFormat(), buyingPlayer.getName(), price);
 		} catch (Exception e) {
-			buyingPlayer.sendMessage(String.format(
-					"The TakeCommand (%s) from config.yml is not correctly formatted.",
-					takeCommandFormat));
+			takeCommandFormat.reportFailure(buyingPlayer, e);
 			return null;			
 		}
 		return takeCommand;
@@ -112,6 +125,10 @@ public class Fixes {
 			sender.sendMessage(String.format("Could not find a user named \"%s\".", playerName));
 			return;
 		}
-		sender.sendMessage(String.format("Your balance is %.2f E-Coins.", balance));
+		try {
+			sender.sendMessage(String.format(currentBalanceFormat.getFormat(), balance));
+		} catch (Exception e) {
+			currentBalanceFormat.reportFailure(sender, e);
+		}
 	}
 }
