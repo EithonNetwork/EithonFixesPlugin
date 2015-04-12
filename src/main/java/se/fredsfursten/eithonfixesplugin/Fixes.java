@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import se.fredsfursten.plugintools.ConfigurableFormat;
 import se.fredsfursten.plugintools.Misc;
+import se.fredsfursten.plugintools.PluginConfig;
 
 import com.earth2me.essentials.api.Economy;
 import com.earth2me.essentials.api.UserDoesNotExistException;
@@ -19,19 +20,7 @@ public class Fixes {
 	private static ConfigurableFormat successfulPurchaseFormat;
 	private static ConfigurableFormat currentBalanceFormat;
 
-	private JavaPlugin plugin = null;
-
 	private Fixes() {
-		giveCommandFormat = new ConfigurableFormat("GiveCommand", 3,
-				"give %s %s %d");
-		takeCommandFormat = new ConfigurableFormat("TakeCommand", 2,
-				"eco take %s %f");
-		youNeedMoreMoneyFormat = new ConfigurableFormat("YouNeedMoreMoneyMessage", 4,
-				"You need %.2f to buy %d %s. You have %.2f.");
-		successfulPurchaseFormat = new ConfigurableFormat("SuccessfulPurchaseMessage", 2,
-				"You successfully purchased %d item(s) of %s.");
-		currentBalanceFormat = new ConfigurableFormat("CurrentBalanceMessage", 1,
-				"Your balance is %.2f E-Coins.");
 	}
 
 	static Fixes get()
@@ -43,7 +32,17 @@ public class Fixes {
 	}
 
 	void enable(JavaPlugin plugin){
-		this.plugin = plugin;
+		PluginConfig config = PluginConfig.get(plugin);
+		giveCommandFormat = new ConfigurableFormat(config, "GiveCommand", 3,
+				"give %s %s %d");
+		takeCommandFormat = new ConfigurableFormat(config, "TakeCommand", 2,
+				"eco take %s %f");
+		youNeedMoreMoneyFormat = new ConfigurableFormat(config, "YouNeedMoreMoneyMessage", 4,
+				"You need %.2f to buy %d %s. You have %.2f.");
+		successfulPurchaseFormat = new ConfigurableFormat(config, "SuccessfulPurchaseMessage", 2,
+				"You successfully purchased %d item(s) of %s.");
+		currentBalanceFormat = new ConfigurableFormat(config, "CurrentBalanceMessage", 1,
+				"Your balance is %.2f E-Coins.");
 		Plugin ess = plugin.getServer().getPluginManager().getPlugin("Economy");
 		if (ess != null && ess.isEnabled()) {
 			plugin.getLogger().info("Succesfully hooked into Essentials economy!");

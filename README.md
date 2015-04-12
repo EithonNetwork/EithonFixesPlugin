@@ -4,6 +4,11 @@ A EithonFixes plugin for Minecraft.
 
 ## Release history
 
+### 2.0 (2015-04-12)
+
+* NEW: Release.
+* BUG: Inverted fly prohibit.
+
 ### 1.5 (2015-04-04)
 
 * NEW: Now uses EithonLibraryPlugin.

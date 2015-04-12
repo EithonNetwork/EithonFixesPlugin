@@ -1,6 +1,6 @@
 name: EithonFixesPlugin
 main: se.fredsfursten.eithonfixesplugin.EithonFixesPlugin
-version: 1.5
+version: 2.0
 author: vanbrayne
 depend: [Essentials, EithonLibraryPlugin]
 description: A Minecraft plugin for Eithon fixes
